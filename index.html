@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>UdoXLaith | 3D Lead Generation & Nurturing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Font & Basic Styles -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #020617;
+      color: #e5e7eb;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* 3D canvas */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: -1;
+    }
+
+    /* Content Layout */
+    .page-wrapper {
+      position: relative;
+      z-index: 10;
+    }
+
+    section {
+      min-height: 100vh;
+      padding: 4rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      text-align: left;
+      color: #f9fafb;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      .hero-cta-group {
+        justify-content: center;
+      }
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.25rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #7dd3fc;
+      margin-bottom: 1.5rem;
+    }
+
+    .badge-dot {
+      width: 0.45rem;
+      height: 0.45rem;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.9);
+    }
+
+    .hero-title {
+      font-size: clamp(2.5rem, 4vw, 3.5rem);
+      line-height: 1.1;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-title span.highlight {
+      background: linear-gradient(135deg, #0ea5e9, #22c55e);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 1.05rem;
+      color: #9ca3af;
+      max-width: 32rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-primary {
+      padding: 0.85rem 1.7rem;
+      border-radius: 999px;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, #0ea5e9, #22c55e);
+      color: #0b1120;
+      box-shadow: 0 20px 45px rgba(56, 189, 248, 0.35);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow: 0 20px 55px rgba(56, 189, 248, 0.45);
+    }
+
+    .btn-primary:disabled {
+      cursor: default;
+    }
+
+    .btn-secondary {
+      padding: 0.8rem 1.3rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.7);
+      color: #e5e7eb;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(15, 23, 42, 0.95);
+      border-color: rgba(148, 163, 184, 0.9);
+      transform: translateY(-1px);
+    }
+
+    .hero-trust {
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    .hero-metric-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      font-size: 0.85rem;
+      margin-top: 1rem;
+    }
+
+    .metric {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .metric span.value {
+      font-weight: 700;
+      color: #e5e7eb;
+      font-size: 1rem;
+    }
+
+    .metric span.label {
+      color: #6b7280;
+      font-size: 0.8rem;
+    }
+
+    /* Right side hero card */
+    .hero-panel {
+      position: relative;
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.25), transparent 50%),
+                  linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.96));
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow:
+        0 20px 40px rgba(15, 23, 42, 0.9),
+        0 0 60px rgba(56, 189, 248, 0.15);
+      backdrop-filter: blur(16px);
+      max-width: 430px;
+      margin-left: auto;
+    }
+
+    @media (max-width: 900px) {
+      .hero-panel {
+        margin: 2rem auto 0;
+      }
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .pill {
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+
+    .panel-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .pipeline {
+      margin-top: 0.75rem;
+      padding: 0.75rem;
+      border-radius: 1rem;
+      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.2), transparent 55%),
+                  rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(15, 23, 42, 0.9);
+    }
+
+    .stage-row {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .stage-icon {
+      width: 1.8rem;
+      height: 1.8rem;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.5), rgba(15, 23, 42, 1));
+      color: #e0f2fe;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+    }
+
+    .stage-text {
+      flex: 1;
+    }
+
+    .stage-text .label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9ca3af;
+    }
+
+    .stage-text .value {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #e5e7eb;
+    }
+
+    .stage-metric {
+      font-size: 0.8rem;
+      color: #22c55e;
+      white-space: nowrap;
+    }
+
+    .bar-bg {
+      margin-top: 0.4rem;
+      width: 100%;
+      height: 0.25rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 1);
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #0ea5e9, #22c55e);
+      width: var(--fill, 40%);
+    }
+
+    .panel-footer {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .spark {
+      font-size: 0.8rem;
+      color: #a5b4fc;
+    }
+
+    /* SECTIONS */
+    .section-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #6b7280;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #e5e7eb;
+    }
+
+    .section-subtitle {
+      font-size: 0.98rem;
+      color: #9ca3af;
+      max-width: 36rem;
+      margin-bottom: 2rem;
+    }
+
+    .grid {
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    @media (min-width: 800px) {
+      .grid-cols-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .grid-cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .grid-cols-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    .card {
+      border-radius: 1rem;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 1), rgba(15, 23, 42, 0.9));
+      padding: 1.2rem;
+      box-shadow: 0 18px 30px rgba(15, 23, 42, 0.8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 55%);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      color: #e5e7eb;
+    }
+
+    .card-text {
+      font-size: 0.9rem;
+      color: #9ca3af;
+      line-height: 1.5;
+    }
+
+    .card-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(44, 62, 80, 0.9);
+      color: #a5b4fc;
+      margin-bottom: 0.8rem;
+    }
+
+    /* Timeline */
+    .timeline {
+      border-left: 1px dashed rgba(55, 65, 81, 1);
+      padding-left: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .timeline-item {
+      margin-bottom: 1rem;
+      position: relative;
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: -1.5rem;
+      top: 0.1rem;
+      width: 0.6rem;
+      height: 0.6rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #0ea5e9, #22c55e);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.7);
+    }
+
+    .timeline-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #6b7280;
+      margin-bottom: 0.1rem;
+    }
+
+    .timeline-title {
+      font-size: 0.95rem;
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+
+    .timeline-text {
+      font-size: 0.85rem;
+      color: #9ca3af;
+    }
+
+    /* Contact section */
+    .contact-grid {
+      display: grid;
+      gap: 2rem;
+    }
+
+    @media (min-width: 880px) {
+      .contact-grid {
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      }
+    }
+
+    .input-group {
+      margin-bottom: 0.9rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      margin-bottom: 0.25rem;
+      color: #9ca3af;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 0.7rem 0.8rem;
+      border-radius: 0.7rem;
+      border: 1px solid rgba(55, 65, 81, 1);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #4b5563;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #0ea5e9;
+      box-shadow: 0 0 0 1px rgba(14, 165, 233, 0.4);
+      background: rgba(15, 23, 42, 1);
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .small {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 0.4rem;
+    }
+
+    .footer {
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #6b7280;
+      border-top: 1px solid rgba(31, 41, 55, 1);
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 1));
+    }
+
+    .footer a {
+      color: #0ea5e9;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Simple fade / slide-in animation */
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: all 0.5s ease-out;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <!-- 3D Background -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Content -->
+  <div class="page-wrapper">
+    <!-- HERO -->
+    <section id="hero">
+      <div class="container hero">
+        <div class="hero-grid">
+          <div class="hero-left reveal">
+            <div class="badge">
+              <span class="badge-dot"></span>
+              <span>UdoXLaith • Lead Gen Engine</span>
+            </div>
+            <h1 class="hero-title">
+              Turn cold leads into
+              <span class="highlight">booked appointments</span>
+              on autopilot.
+            </h1>
+            <p class="hero-subtitle">
+              UdoXLaith designs, builds, and runs your lead generation & nurturing system so you stop chasing DMs and start taking calls from
+              <strong>warm buyers</strong>.
+            </p>
+            <div class="hero-cta-group">
+              <a href="#contact" class="btn-primary">
+                Book a 3D Pipeline Demo
+                <span>↗</span>
+              </a>
+              <a href="#how-it-works" class="btn-secondary">
+                See how the system works
+              </a>
+            </div>
+            <div class="hero-trust">
+              <div>✅ Ideal for agencies, medspas, home services, and local businesses.</div>
+              <div class="hero-metric-row">
+                <div class="metric">
+                  <span class="value">3–7x</span>
+                  <span class="label">More conversations from the same leads</span>
+                </div>
+                <div class="metric">
+                  <span class="value">24/7</span>
+                  <span class="label">Nurturing via SMS, email, and DMs</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-right reveal">
+            <div class="hero-panel">
+              <div class="panel-header">
+                <span class="panel-title">Live Pipeline • UdoXLaith OS</span>
+                <span class="pill">Leads flowing in real-time</span>
+              </div>
+
+              <div class="pipeline">
+                <div class="stage-row">
+                  <div class="stage-icon">👁‍🗨</div>
+                  <div class="stage-text">
+                    <div class="label">Stage 1 • Cold Traffic</div>
+                    <div class="value">3,842 visitors hit your landing pages</div>
+                    <div class="bar-bg">
+                      <div class="bar-fill" style="--fill: 100%;"></div>
+                    </div>
+                  </div>
+                  <div class="stage-metric">100%</div>
+                </div>
+
+                <div class="stage-row">
+                  <div class="stage-icon">📨</div>
+                  <div class="stage-text">
+                    <div class="label">Stage 2 • Leads Captured</div>
+                    <div class="value">728 opt-ins via forms, DMs & SMS</div>
+                    <div class="bar-bg">
+                      <div class="bar-fill" style="--fill: 46%;"></div>
+                    </div>
+                  </div>
+                  <div class="stage-metric">+12.9% CR</div>
+                </div>
+
+                <div class="stage-row">
+                  <div class="stage-icon">🤖</div>
+                  <div class="stage-text">
+                    <div class="label">Stage 3 • Nurturing & Follow-Up</div>
+                    <div class="value">AI + human workflows warm up every lead</div>
+                    <div class="bar-bg">
+                      <div class="bar-fill" style="--fill: 28%;"></div>
+                    </div>
+                  </div>
+                  <div class="stage-metric">78% replied</div>
+                </div>
+
+                <div class="stage-row">
+                  <div class="stage-icon">📆</div>
+                  <div class="stage-text">
+                    <div class="label">Stage 4 • Booked Appointments</div>
+                    <div class="value">71 sales-ready calls booked this month</div>
+                    <div class="bar-bg">
+                      <div class="bar-fill" style="--fill: 18%;"></div>
+                    </div>
+                  </div>
+                  <div class="stage-metric">9.7% of leads</div>
+                </div>
+              </div>
+
+              <div class="panel-footer">
+                <span class="spark">⚡ Powered by UdoXLaith lead flows</span>
+                <span>Updated live as your system runs.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="how-it-works">
+      <div class="container reveal">
+        <div class="section-label">How it works</div>
+        <h2 class="section-title">Your lead engine in four simple stages.</h2>
+        <p class="section-subtitle">
+          We plug into your existing traffic (or build it with you), capture every hand-raise,
+          then nurture, qualify, and book calls — all inside a system that runs 24/7.
+        </p>
+
+        <div class="grid grid-cols-4 grid-cols-2">
+          <div class="card">
+            <div class="card-tag">Stage 1 • Capture</div>
+            <div class="card-title">Leads from everywhere</div>
+            <p class="card-text">
+              Landing pages, Instagram DMs, TikTok, website forms, call-back widgets — we centralize your inbound
+              attention so every potential buyer becomes a trackable lead in the UdoXLaith OS.
+            </p>
+          </div>
+          <div class="card">
+            <div class="card-tag">Stage 2 • Nurture</div>
+            <div class="card-title">Multi-channel follow-up</div>
+            <p class="card-text">
+              Automated but human-style follow-ups across SMS, email, and DMs to open conversations, answer basic
+              objections, send social proof, and keep you top-of-mind — without you typing a word.
+            </p>
+          </div>
+          <div class="card">
+            <div class="card-tag">Stage 3 • Qualify</div>
+            <div class="card-title">Filter out the tire-kickers</div>
+            <p class="card-text">
+              Simple qualifying flows ask the right questions to segment hot vs. cold leads, so your calendar fills
+              with people who are ready, able, and willing to move.
+            </p>
+          </div>
+          <div class="card">
+            <div class="card-tag">Stage 4 • Book</div>
+            <div class="card-title">Calendar full, inbox quiet</div>
+            <p class="card-text">
+              Once someone is qualified, the system routes them to the right calendar or closer. You get Slack / email
+              alerts with context, not random “are you free?” messages.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3D-INSPIRED PIPELINE / PROCESS -->
+    <section id="pipeline">
+      <div class="container reveal">
+        <div class="section-label">3D Pipeline View</div>
+        <h2 class="section-title">Imagine your leads as a 3D flow field.</h2>
+        <p class="section-subtitle">
+          The background you’re seeing is a live 3D scene: each glowing node represents a lead,
+          moving through a pipeline from cold traffic to booked calls. That’s exactly how we think
+          about your growth — as a system, not random one-off campaigns.
+        </p>
+
+        <div class="grid grid-cols-2">
+          <div class="card">
+            <div class="card-title">What we build for you</div>
+            <ul class="card-text" style="list-style: none; padding-left: 0; margin-top: 0.5rem;">
+              <li>• High-converting landing experience or lead capture flow</li>
+              <li>• Automated SMS & email sequences tailored to your offer</li>
+              <li>• Unified inbox & pipeline tracking (no more lost leads)</li>
+              <li>• Appointment booking flows & reminder sequences</li>
+              <li>• Reporting so you can see every step of the journey</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-title">From “I clicked” to “Let’s talk”</div>
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="timeline-label">T+0 min</div>
+                <div class="timeline-title">Lead opts-in or DM’s you</div>
+                <div class="timeline-text">System tags the lead, logs their source, and sends a warm, on-brand welcome.</div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-label">T+3–15 min</div>
+                <div class="timeline-title">Follow-up sequence begins</div>
+                <div class="timeline-text">Questions, social proof, and micro-commitments designed to spark replies.</div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-label">T+24–72 hrs</div>
+                <div class="timeline-title">Nurturing & sorting</div>
+                <div class="timeline-text">Hot leads move toward your calendar; colder leads stay in a long-term nurture track.</div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-label">T+3–7 days</div>
+                <div class="timeline-title">Booked appointments in your calendar</div>
+                <div class="timeline-text">You show up to calls with context and intent, not random time-wasters.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT / CALL TO ACTION -->
+    <section id="contact">
+      <div class="container reveal">
+        <div class="section-label">Work with UdoXLaith</div>
+        <h2 class="section-title">Let’s build your lead engine.</h2>
+        <p class="section-subtitle">
+          Tell us a bit about your offer, price point, and how you’d like your follow-up to feel.
+          We’ll map out a lead generation & nurturing system tailored to your business and walk you through it live.
+        </p>
+
+        <div class="contact-grid">
+          <div>
+            <form id="contact-form">
+              <div class="input-group">
+                <label for="name">Name</label>
+                <input id="name" type="text" placeholder="Udo Onyekwere" />
+              </div>
+              <div class="input-group">
+                <label for="email">Email</label>
+                <input id="email" type="email" placeholder="you@example.com" />
+              </div>
+              <div class="input-group">
+                <label for="business">Business / Offer</label>
+                <input id="business" type="text" placeholder="Medspa, agency, home services, coaching, etc." />
+              </div>
+
+              <!-- Follow-up frequency -->
+              <div class="input-group">
+                <label for="frequency">Follow-up frequency</label>
+                <select id="frequency">
+                  <option value="daily">Daily</option>
+                  <option value="every_3_days">Every 3 days</option>
+                  <option value="weekly">Once a week</option>
+                </select>
+                <div class="small">
+                  How often should we follow up with your leads?
+                </div>
+              </div>
+
+              <button type="button" id="submit-btn" class="btn-primary">
+                Request pipeline strategy call
+                <span>→</span>
+              </button>
+              <div class="small">
+                No spam, no mass email lists — just a direct reply from the UdoXLaith team.
+              </div>
+            </form>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-tag">What to expect</div>
+              <div class="card-title">On your strategy call</div>
+              <p class="card-text" style="margin-bottom: 0.75rem;">
+                We’ll audit your current lead flow, walk you through a 3D pipeline view of your buyer journey, and show
+                you where automation can plug leaks and stack appointments.
+              </p>
+              <ul class="card-text" style="list-style: none; padding-left: 0;">
+                <li>• Identify where leads are falling through the cracks</li>
+                <li>• Design a simple nurture + booking flow</li>
+                <li>• Map it to tools you already use (or recommend new ones)</li>
+                <li>• Give you a clear “build with us” or “DIY” option</li>
+              </ul>
+            </div>
+            <div class="small" style="margin-top: 0.75rem;">
+              Prefer async? You can also send a loom and we’ll reply back with a tailored pipeline breakdown.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div>© <span id="year"></span> UdoXLaith. All rights reserved.</div>
+      <div style="margin-top: 0.25rem;">
+        Built as a 3D-inspired lead generation experience. Host this on Netlify and plug it into your automation stack.
+      </div>
+    </footer>
+  </div>
+
+  <!-- Three.js -->
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+
+  <script>
+    // Set year in footer
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ----- 3D BACKGROUND SCENE -----
+    const canvas = document.getElementById('bg-canvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x020617);
+
+    const camera = new THREE.PerspectiveCamera(
+      60,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      100
+    );
+    camera.position.set(0, 0, 9);
+
+    // Lights
+    const light1 = new THREE.PointLight(0x38bdf8, 2, 40);
+    light1.position.set(6, 4, 6);
+    scene.add(light1);
+
+    const light2 = new THREE.PointLight(0x22c55e, 1.6, 40);
+    light2.position.set(-6, -4, 6);
+    scene.add(light2);
+
+    const ambient = new THREE.AmbientLight(0x0b1120, 0.4);
+    scene.add(ambient);
+
+    // Central "lead engine" object
+    const coreGeometry = new THREE.IcosahedronGeometry(1.6, 1);
+    const coreMaterial = new THREE.MeshStandardMaterial({
+      color: 0x0ea5e9,
+      metalness: 0.7,
+      roughness: 0.25,
+      emissive: 0x0f172a,
+      emissiveIntensity: 0.6
+    });
+    const coreMesh = new THREE.Mesh(coreGeometry, coreMaterial);
+    scene.add(coreMesh);
+
+    // Wireframe overlay
+    const wireGeo = new THREE.IcosahedronGeometry(1.7, 1);
+    const wireMat = new THREE.MeshBasicMaterial({
+      color: 0x38bdf8,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.25
+    });
+    const wireMesh = new THREE.Mesh(wireGeo, wireMat);
+    scene.add(wireMesh);
+
+    // Swarm of "lead nodes"
+    const particleCount = 450;
+    const positions = new Float32Array(particleCount * 3);
+    const speeds = new Float32Array(particleCount);
+
+    for (let i = 0; i < particleCount; i++) {
+      const radius = 4 + Math.random() * 9;
+      const angle = Math.random() * Math.PI * 2;
+      const height = (Math.random() - 0.5) * 6;
+
+      positions[i * 3 + 0] = Math.cos(angle) * radius;
+      positions[i * 3 + 1] = height;
+      positions[i * 3 + 2] = Math.sin(angle) * radius;
+
+      speeds[i] = 0.0008 + Math.random() * 0.0018;
+    }
+
+    const particleGeometry = new THREE.BufferGeometry();
+    particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+    const particleMaterial = new THREE.PointsMaterial({
+      color: 0x7dd3fc,
+      size: 0.05,
+      sizeAttenuation: true,
+      transparent: true,
+      opacity: 0.9
+    });
+
+    const particles = new THREE.Points(particleGeometry, particleMaterial);
+    scene.add(particles);
+
+    // Scroll-based interaction
+    let scrollProgress = 0;
+
+    function updateScrollProgress() {
+      const scrollTop = window.scrollY || window.pageYOffset;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      scrollProgress = docHeight > 0 ? scrollTop / docHeight : 0;
+    }
+
+    window.addEventListener('scroll', updateScrollProgress, { passive: true });
+    updateScrollProgress();
+
+    // Mouse parallax
+    let mouseX = 0;
+    let mouseY = 0;
+
+    window.addEventListener('mousemove', (event) => {
+      const x = (event.clientX / window.innerWidth) * 2 - 1;
+      const y = (event.clientY / window.innerHeight) * 2 - 1;
+      mouseX = x;
+      mouseY = y;
+    });
+
+    // Animation loop
+    const clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const elapsed = clock.getElapsedTime();
+
+      coreMesh.rotation.x = elapsed * 0.18;
+      coreMesh.rotation.y = elapsed * 0.24;
+      wireMesh.rotation.x = -elapsed * 0.12;
+      wireMesh.rotation.y = elapsed * 0.16;
+
+      // Animate particles in circular orbits and small noise
+      const posAttr = particleGeometry.getAttribute('position');
+      for (let i = 0; i < particleCount; i++) {
+        const x = posAttr.getX(i);
+        const z = posAttr.getZ(i);
+        const radius = Math.sqrt(x * x + z * z) || 1;
+        const angle = elapsed * speeds[i] * 180;
+
+        const newX = Math.cos(angle) * radius;
+        const newZ = Math.sin(angle) * radius;
+
+        posAttr.setX(i, newX);
+        posAttr.setZ(i, newZ);
+
+        const baseY = posAttr.getY(i);
+        posAttr.setY(i, baseY + Math.sin(elapsed * 0.3 + i * 0.15) * 0.001);
+      }
+      posAttr.needsUpdate = true;
+
+      // Scroll → camera path (slight dolly + tilt)
+      const targetZ = 9 - scrollProgress * 3.5;
+      const targetY = scrollProgress * 1.4 - 0.4;
+      const targetX = mouseX * 0.6;
+
+      camera.position.z += (targetZ - camera.position.z) * 0.04;
+      camera.position.y += (targetY - camera.position.y) * 0.04;
+      camera.position.x += (targetX - camera.position.x) * 0.04;
+
+      camera.lookAt(0, 0, 0);
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // Resize handling
+    window.addEventListener('resize', () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      renderer.setSize(width, height);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+    });
+
+    // ----- Scroll reveal for sections -----
+    const revealEls = document.querySelectorAll('.reveal');
+
+    function handleReveal() {
+      const triggerBottom = window.innerHeight * 0.82;
+
+      revealEls.forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < triggerBottom) {
+          el.classList.add('visible');
+        }
+      });
+    }
+
+    window.addEventListener('scroll', handleReveal, { passive: true });
+    window.addEventListener('load', handleReveal);
+
+    // ----- Payload builder + Calendly redirect -----
+    const submitBtn = document.getElementById('submit-btn');
+
+    if (submitBtn) {
+      submitBtn.addEventListener('click', function (event) {
+        event.preventDefault();
+
+        const payload = {
+          name: document.getElementById('name').value.trim(),
+          email: document.getElementById('email').value.trim(),
+          business: document.getElementById('business').value.trim(),
+          follow_up_frequency: document.getElementById('frequency').value
+        };
+
+        console.log('Sending to Make:', payload);
+
+        // Open Calendly in a new tab right away
+        window.open('https://calendly.com/utglabs/book-call', '_blank');
+
+        // Button feedback instantly
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Sending...';
+        submitBtn.style.opacity = '0.6';
+
+        fetch('https://hook.us1.make.com/897d1guu2gy1jlksxghk63s5siy95sxl', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+          .then(() => {
+            submitBtn.innerText = 'Sent ✓';
+            submitBtn.style.opacity = '1';
+            submitBtn.style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
+            submitBtn.style.cursor = 'default';
+          })
+          .catch(() => {
+            submitBtn.innerText = 'Error — Try Again';
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = '1';
+            submitBtn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+          });
+      });
+    }
+  </script>
+</body>
+</html>
